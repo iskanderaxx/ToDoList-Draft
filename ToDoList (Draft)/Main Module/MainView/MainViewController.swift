@@ -8,16 +8,18 @@
 import UIKit
 import SnapKit
 
-protocol AnyView: AnyObject { // UserViewProtocol
-    var presenter: AnyPresenter? { get set } // Shall have reference to Presenter
+protocol MainViewProtocol: AnyObject {
+    var presenter: MainPresenterProtocol? { get set } // Shall have reference to Presenter
     
-    func update(with tasks: [TaskList])
-    func update(with error: Error)
+//    func update(with tasks: [TaskList])
+//    func update(with error: Error)
+    func showFetchedTasks(_ result: [TaskList])
+    func showError(_ error: Error)
 }
 
-final class UserView: UIViewController, AnyView {
-    var presenter: AnyPresenter?
-//    private var tasks: [TaskList] = []
+final class MainViewController: UIViewController, MainViewProtocol {
+    var presenter: MainPresenterProtocol?
+    var tasks: [TaskList] = [] // это нужно убрать отсюда в интерактор или куда-то еще
 //    private var coreDataManager = CoreDataManager.shared
     
     // MARK: - UI Elements
@@ -87,14 +89,14 @@ final class UserView: UIViewController, AnyView {
         setupLayout()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        loadData()
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        loadData()
+//    }
     
-    deinit {
-         tableView.removeObserver(self, forKeyPath: "contentSize")
-     }
+//    deinit {
+//         tableView.removeObserver(self, forKeyPath: "contentSize")
+//     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -109,8 +111,8 @@ final class UserView: UIViewController, AnyView {
     }
     
     private func setupUserPresenter() {
-        presenter = UserPresenter()
-        presenter?.getAllTasks()
+//        presenter = MainPresenter()
+        presenter?.viewDidLoad()
     }
     
     private func setupViewHierarchy() {
@@ -144,60 +146,70 @@ final class UserView: UIViewController, AnyView {
             make.trailing.equalTo(grayView.snp.trailing).offset(-15)
             make.height.equalTo(0)
         }
-        
-        tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
+//        
+//        tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
     }
     
-    func update(with tasks: [TaskList]) {
-        DispatchQueue.main.async {
-//            self.presenter?.fetchTasks()
-            self.tableView.reloadData()
-            self.tableView.isHidden = false
-        }
+//    func update(with tasks: [TaskList]) {
+//        DispatchQueue.main.async {
+////            self.presenter?.fetchTasks()
+//            self.tableView.reloadData()
+//            self.tableView.isHidden = false
+//        }
+//    }
+    
+//    func loadData() {
+//       presenter?.fetchTasks()
+//    }
+    
+    func showFetchedTasks(_ result: [TaskList]) {
+        self.tasks = result
+        tableView.reloadData()
     }
     
-    func loadData() {
-       presenter?.fetchTasks()
-    }
-    
-    func update(with error: Error) {
+    func showError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Noted", style: .default))
+        alert.addAction(UIAlertAction(title: "Ok", style: .default))
         present(alert, animated: true)
     }
+    
+//    func update(with error: Error) {
+//
+//    }
     
     // MARK: - Actions
     
     @objc
     private func addTaskButtonPressed() {
-        guard let task = textField.text, !task.isEmpty else { return }
-        presenter?.addNewTask(title: title ?? "Task unavailable")
-        textField.text = ""
+//        guard let task = textField.text, !task.isEmpty else { return }
+//        presenter?.addNewTask(title: title ?? "Task unavailable")
+//        textField.text = ""
     }
 }
 
-extension UserView: UITableViewDelegate, UITableViewDataSource {
+extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        tasks.count // presenter.tasks.count
+        tasks.count // presenter.tasks.count сделать
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "defaultCell", for: indexPath)
-        cell.textLabel?.text = tasks[indexPath.row].title
+        let task = tasks[indexPath.row]
+        cell.textLabel?.text = task.title
         cell.accessoryType = .disclosureIndicator
         return cell
     }
-    
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        true
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-           let task = tasks[indexPath.row]
-            presenter?.deleteTask(task)
-            tableView.reloadData()
-        }
-    }
 }
+//    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+//        true
+//    }
+//    
+//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//        if editingStyle == .delete {
+//           let task = tasks[indexPath.row]
+//            presenter?.deleteTask(task)
+//            tableView.reloadData()
+//        }
+//    }
+
 

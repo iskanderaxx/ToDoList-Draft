@@ -7,17 +7,18 @@
 
 import UIKit
 
-protocol AnyPresenter {
-    var view: AnyView? { get set } // Shall have references to View, Interactor & Router
-    var interactor: AnyInteractor? { get set }
-    var router: AnyRouter? { get set }
+protocol MainPresenterProtocol {
+    var view: MainViewProtocol? { get set } // Shall have references to View, Interactor & Router
+    var interactor: MainInteractorProtocol? { get set }
+    var router: MainRouter? { get set }
     
-    func interactorDidFetchTasks(with result: Result<[TaskList], Error>)
-    func fetchTasks()
-    func getAllTasks()
-    func addNewTask(title: String)
-    func updateTheTask(_ task: TaskList, title: String, contents: String, isCompleted: Bool, date: Date)
-    func deleteTask(_ task: TaskList)
+    func viewDidLoad()
+    func interactorDidFetchTasks(_ result: [TaskList])
+    func interactorDidFailFetchTasks(with error: Error)
+//    func getAllTasks()
+//    func addNewTask(title: String)
+//    func updateTheTask(_ task: TaskList, title: String, contents: String, isCompleted: Bool, date: Date)
+//    func deleteTask(_ task: TaskList)
 }
 
 // Доработать enum
@@ -25,42 +26,50 @@ enum FetchError: Error {
     case failed
 }
 
-final class UserPresenter: AnyPresenter {
-    weak var view: AnyView?
-    private var coreDataService = CoreDataManager.shared
+final class MainPresenter: MainPresenterProtocol {
+    weak var view: MainViewProtocol?
+//    private var coreDataService = CoreDataManager.shared
+    var interactor: MainInteractorProtocol?
+    var router: MainRouter?
     
-    var interactor: AnyInteractor?
-    var router: AnyRouter?
-    
-    func fetchTasks() {
+    func viewDidLoad() {
         interactor?.fetchTasks()
     }
     
-    func interactorDidFetchTasks(with result: Result<[TaskList], Error>) {
-        switch result {
-        case .success(let tasks):
-            view?.update(with: tasks)
-        case .failure:
-            view?.update(with: FetchError.failed)
+    func interactorDidFetchTasks(_ result: [TaskList]) { // with result: Result<[TaskList], Error>
+        DispatchQueue.main.async {
+            self.view?.showFetchedTasks(result)
+        }
+//        switch result {
+//        case .success(let tasks):
+//            view?.update(with: tasks)
+//        case .failure:
+//            view?.update(with: FetchError.failed)
+//        }
+    }
+    
+    func interactorDidFailFetchTasks(with error: Error) {
+        DispatchQueue.main.async {
+            self.view?.showError(error)
         }
     }
-    
-    func getAllTasks() {
-        let tasks = coreDataService.fetchAllTasks()
-        view?.update(with: tasks)
-    }
-    
-    func addNewTask(title: String) {
-        coreDataService.createTask(title: title)
-        getAllTasks()
-    }
-    
-    func updateTheTask(_ task: TaskList, title: String, contents: String, isCompleted: Bool, date: Date) {
-        coreDataService.updateTask(task, newTitle: title, newContents: contents, isCompleted: isCompleted, newDate: date)
-    }
-    
-    func deleteTask(_ task: TaskList) {
-        coreDataService.deleteTask(task)
-        getAllTasks()
-    }
+//    
+//    func getAllTasks() {
+//        let tasks = coreDataService.fetchAllTasks()
+//        view?.update(with: tasks)
+//    }
+//    
+//    func addNewTask(title: String) {
+//        coreDataService.createTask(title: title)
+//        getAllTasks()
+//    }
+//    
+//    func updateTheTask(_ task: TaskList, title: String, contents: String, isCompleted: Bool, date: Date) {
+//        coreDataService.updateTask(task, newTitle: title, newContents: contents, isCompleted: isCompleted, newDate: date)
+//    }
+//    
+//    func deleteTask(_ task: TaskList) {
+//        coreDataService.deleteTask(task)
+//        getAllTasks()
+//    }
 }

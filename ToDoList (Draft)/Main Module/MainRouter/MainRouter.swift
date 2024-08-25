@@ -7,23 +7,23 @@
 
 import UIKit
 
-typealias EntryPoint = AnyView & UIViewController
+typealias EntryPoint = MainViewProtocol & UIViewController
 
 // Router contains protocol+object and entryPoint
-protocol AnyRouter {
+protocol MainRouterProtocol {
     var entryPoint: EntryPoint? { get }
-    static func start() -> AnyRouter
+    static func start() -> MainRouterProtocol
 }
 
-final class UserRouter: AnyRouter {
+final class MainRouter: MainRouterProtocol {
     var entryPoint: EntryPoint?
     
-    static func start() -> AnyRouter {
-        let router = UserRouter()
+    static func start() -> MainRouterProtocol {
+        let router = MainRouter()
         
-        let view = UserView()
-        let interactor = UserInteractor()
-        let presenter = UserPresenter()
+        let view = MainViewController()
+        let interactor = MainInteractor()
+        let presenter = MainPresenter()
         
         view.presenter = presenter
         interactor.presenter = presenter
