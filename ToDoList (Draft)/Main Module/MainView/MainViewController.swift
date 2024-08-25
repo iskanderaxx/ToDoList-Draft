@@ -9,17 +9,15 @@ import UIKit
 import SnapKit
 
 protocol MainViewProtocol: AnyObject {
-    var presenter: MainPresenterProtocol? { get set } // Shall have reference to Presenter
+    // Shall have reference to Presenter
+    var presenter: MainPresenterProtocol? { get set }
     
-//    func update(with tasks: [TaskList])
-//    func update(with error: Error)
     func showFetchedTasks(_ result: [TaskList])
     func showError(_ error: Error)
 }
 
 final class MainViewController: UIViewController, MainViewProtocol {
     var presenter: MainPresenterProtocol?
-    var tasks: [TaskList] = [] // это нужно убрать отсюда в интерактор или куда-то еще
 //    private var coreDataManager = CoreDataManager.shared
     
     // MARK: - UI Elements
@@ -37,7 +35,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
                                                   width: 10,
                                                   height: textField.frame.height))
         textField.leftViewMode = .always
-        // Метод, чтобы убрать тап вне экрана - посмотреть
+        // Метод, чтобы убрать тап вне экрана
         return textField
     }()
     
@@ -64,16 +62,13 @@ final class MainViewController: UIViewController, MainViewProtocol {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.register(UITableViewCell.self,
                            forCellReuseIdentifier: "defaultCell")
-        tableView.isHidden = true
         tableView.dataSource = self
         tableView.delegate = self
         tableView.layer.cornerRadius = 20
         tableView.layer.masksToBounds = true
-        
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.isScrollEnabled = false
-        // Метод, чтобы убрать тап вне экрана - посмотреть
+        // Метод, чтобы убрать тап вне экрана
         return tableView
     }()
     
@@ -89,19 +84,15 @@ final class MainViewController: UIViewController, MainViewProtocol {
         setupLayout()
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        loadData()
-//    }
-    
-//    deinit {
-//         tableView.removeObserver(self, forKeyPath: "contentSize")
-//     }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        tableView.frame = view.bounds
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        presenter?.viewDidLoad()
     }
+    
+//    override func viewDidLayoutSubviews() {
+//        super.viewDidLayoutSubviews()
+//        tableView.frame = view.bounds
+//    }
     
     // MARK: - Setup & Layout
     
@@ -111,7 +102,6 @@ final class MainViewController: UIViewController, MainViewProtocol {
     }
     
     private func setupUserPresenter() {
-//        presenter = MainPresenter()
         presenter?.viewDidLoad()
     }
     
@@ -144,27 +134,23 @@ final class MainViewController: UIViewController, MainViewProtocol {
             make.top.equalTo(grayView.snp.top).offset(15)
             make.leading.equalTo(grayView.snp.leading).offset(15)
             make.trailing.equalTo(grayView.snp.trailing).offset(-15)
+            make.bottom.equalTo(grayView.snp.bottom).offset(-25)
+//            make.height.lessThanOrEqualTo(tableView.contentSize.height)
             make.height.equalTo(0)
         }
-//        
-//        tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
+        tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
     }
     
-//    func update(with tasks: [TaskList]) {
-//        DispatchQueue.main.async {
-////            self.presenter?.fetchTasks()
-//            self.tableView.reloadData()
-//            self.tableView.isHidden = false
-//        }
-//    }
-    
-//    func loadData() {
-//       presenter?.fetchTasks()
-//    }
+    deinit {
+         tableView.removeObserver(self, forKeyPath: "contentSize")
+     }
     
     func showFetchedTasks(_ result: [TaskList]) {
-        self.tasks = result
-        tableView.reloadData()
+        DispatchQueue.main.async {
+//            print("Tasks received: \(result.count)")
+            self.tableView.reloadData()
+//            self.tableView.layoutIfNeeded()
+        }
     }
     
     func showError(_ error: Error) {
@@ -172,10 +158,6 @@ final class MainViewController: UIViewController, MainViewProtocol {
         alert.addAction(UIAlertAction(title: "Ok", style: .default))
         present(alert, animated: true)
     }
-    
-//    func update(with error: Error) {
-//
-//    }
     
     // MARK: - Actions
     
@@ -189,27 +171,39 @@ final class MainViewController: UIViewController, MainViewProtocol {
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        tasks.count // presenter.tasks.count сделать
+        presenter?.tasksCount ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "defaultCell", for: indexPath)
-        let task = tasks[indexPath.row]
-        cell.textLabel?.text = task.title
-        cell.accessoryType = .disclosureIndicator
+        if let task = presenter?.receiveTask(at: indexPath.row) {
+            cell.textLabel?.text = task.todo
+            cell.accessoryType = .disclosureIndicator
+        }
         return cell
     }
-}
-//    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-//        true
-//    }
-//    
-//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        if editingStyle == .delete {
-//           let task = tasks[indexPath.row]
-//            presenter?.deleteTask(task)
-//            tableView.reloadData()
-//        }
-//    }
 
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        true
+    }
+    
+    //    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    //        if editingStyle == .delete {
+    //           let task = tasks[indexPath.row]
+    //            presenter?.deleteTask(task)
+    //            tableView.reloadData()
+    //        }
+    //    }
+}
+
+extension MainViewController {
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "contentSize" {
+            tableView.snp.updateConstraints { make in
+                make.height.equalTo(tableView.contentSize.height)
+            }
+        }
+    }
+}
 

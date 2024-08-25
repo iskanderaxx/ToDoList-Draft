@@ -9,7 +9,7 @@ import UIKit
 
 typealias EntryPoint = MainViewProtocol & UIViewController
 
-// Router contains protocol+object and entryPoint
+// // Shall have an EntryPoint
 protocol MainRouterProtocol {
     var entryPoint: EntryPoint? { get }
     static func start() -> MainRouterProtocol

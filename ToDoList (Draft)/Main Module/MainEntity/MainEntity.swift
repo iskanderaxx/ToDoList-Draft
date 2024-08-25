@@ -7,10 +7,18 @@
 
 import Foundation
 
-struct TaskList: Decodable {
-    let id: Int?
-    let title: String?
-    let description: String?
-    let isCompleted: Bool
-    let date: Date?
+struct TaskResponse: Codable {
+    let todos: [TaskList]
+}
+
+struct TaskList: Codable {
+    let id: Int
+    let todo: String
+    let completed: Bool
+    let userID: Int
+
+    enum CodingKeys: String, CodingKey {
+        case id, todo, completed
+        case userID = "userId"
+    }
 }

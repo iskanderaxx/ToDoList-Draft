@@ -8,12 +8,14 @@
 import UIKit
 
 protocol MainInteractorProtocol {
+    // Shall have reference to Presenter
     var presenter: MainPresenterProtocol? { get set }
+    
     func fetchTasks()
 }
 
 final class MainInteractor: MainInteractorProtocol {
-    var presenter: MainPresenterProtocol? // Shall have reference to Presenter
+    var presenter: MainPresenterProtocol?
 //    var coreDataManager = CoreDataManager.shared
     
     func fetchTasks() {
@@ -21,30 +23,16 @@ final class MainInteractor: MainInteractorProtocol {
         
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             if let error = error {
-//                self?.presenter?.failedToFetchTasks(with: error)
-//                self?.presenter?.interactorDidFetchTasks(with: .failure(error))
                 self?.presenter?.interactorDidFailFetchTasks(with: error)
                 return
             }
             
             guard let data = data else { return }
-//                self?.presenter?.interactorDidFetchTasks(with: .failure(FetchError.failed))
+            
             do {
-//              let tasks = try JSONDecoder().decode([ToDoList].self, from: data)
-                let response = try JSONDecoder().decode([TaskList].self, from: data)
-//                self?.presenter?.fetchTasks(with: response)
-                self?.presenter?.interactorDidFetchTasks(response)
-//                  X self?.presenter?.didFetchTasks(with: response)
-//                let tasks = toDoItems.map { toDoItem -> TaskList in
-//                    let task = TaskList(context: CoreDataManager.shared.context) // coreDataManager
-//                    task.title = toDoItem.title
-//                    task.isCompleted = toDoItem.completed
-//                    return task
-//                }
-//                CoreDataManager.shared.saveContext()
-//                self?.presenter?.interactorDidFetchTasks(with: .success(tasks))
-            } catch {
-//                self?.presenter?.interactorDidFetchTasks(with: .failure(error))
+                let taskResponse = try JSONDecoder().decode(TaskResponse.self, from: data)
+                self?.presenter?.interactorDidFetchTasks(taskResponse.todos)
+            } catch let error {
                 self?.presenter?.interactorDidFailFetchTasks(with: error)
             }
         }
