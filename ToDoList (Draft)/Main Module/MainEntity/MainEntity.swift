@@ -13,12 +13,12 @@ struct TaskResponse: Codable {
 
 struct TaskList: Codable {
     let id: Int
-    let todo: String
+    let title: String
     let completed: Bool
     let userID: Int
 
     enum CodingKeys: String, CodingKey {
-        case id, todo, completed
+        case id, title, completed
         case userID = "userId"
     }
 }

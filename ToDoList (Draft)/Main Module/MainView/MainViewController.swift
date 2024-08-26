@@ -18,7 +18,7 @@ protocol MainViewProtocol: AnyObject {
 
 final class MainViewController: UIViewController, MainViewProtocol {
     var presenter: MainPresenterProtocol?
-//    private var coreDataManager = CoreDataManager.shared
+    private var coreDataManager = CoreDataManager.shared
     
     // MARK: - UI Elements
     
@@ -163,9 +163,9 @@ final class MainViewController: UIViewController, MainViewProtocol {
     
     @objc
     private func addTaskButtonPressed() {
-//        guard let task = textField.text, !task.isEmpty else { return }
-//        presenter?.addNewTask(title: title ?? "Task unavailable")
-//        textField.text = ""
+        guard let task = textField.text, !task.isEmpty else { return }
+        presenter?.addNewTask(task)
+        textField.text = ""
     }
 }
 
@@ -177,7 +177,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "defaultCell", for: indexPath)
         if let task = presenter?.receiveTask(at: indexPath.row) {
-            cell.textLabel?.text = task.todo
+            cell.textLabel?.text = task.title
             cell.accessoryType = .disclosureIndicator
         }
         return cell

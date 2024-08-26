@@ -15,13 +15,13 @@ protocol MainPresenterProtocol {
     var tasksCount: Int { get }
     
     func viewDidLoad()
-    func receiveTask(at index: Int) -> TaskList?
     func interactorDidFetchTasks(_ result: [TaskList])
     func interactorDidFailFetchTasks(with error: Error)
+    func receiveTask(at index: Int) -> TaskList?
 //    func getAllTasks()
-//    func addNewTask(title: String)
-//    func updateTheTask(_ task: TaskList, title: String, contents: String, isCompleted: Bool, date: Date)
-//    func deleteTask(_ task: TaskList)
+    func addNewTask(_ title: String)
+    func updateTheTask(_ task: ToDoList, title: String, isCompleted: Bool, userID: Int)
+    func deleteTask(_ task: ToDoList)
 }
 
 // Доработать enum
@@ -31,23 +31,30 @@ enum FetchError: Error {
 
 final class MainPresenter: MainPresenterProtocol {
     weak var view: MainViewProtocol?
-    //    private var coreDataService = CoreDataManager.shared
     var interactor: MainInteractorProtocol?
     var router: MainRouter?
     private var tasks: [TaskList] = []
+    private var storedTasks: [ToDoList] = [] // Это надо убрать
+    private var coreDataManager = CoreDataManager.shared
     
-    var tasksCount: Int {
-        return tasks.count
-    }
+    var tasksCount: Int { tasks.count }
+    
+    // MARK: - Setup
     
     func viewDidLoad() {
         interactor?.fetchTasks()
+        storedTasks = coreDataManager.fetchAllTasks()
+        view?.showFetchedTasks(tasks)
     }
     
     func interactorDidFetchTasks(_ result: [TaskList]) {
         self.tasks = result
         DispatchQueue.main.async {
             self.view?.showFetchedTasks(result)
+        }
+        
+        result.forEach { task in
+            coreDataManager.createTask(title: task.title)
         }
     }
     
@@ -61,24 +68,29 @@ final class MainPresenter: MainPresenterProtocol {
         guard index < tasks.count else { return nil }
         return tasks[index]
     }
-}
-//
+
 //    func getAllTasks() {
 //        let tasks = coreDataService.fetchAllTasks()
 //        view?.update(with: tasks)
 //    }
-//    
-//    func addNewTask(_ toDo: String) {
-//        coreDataService.createTask(title: title)
-//        getAllTasks()
-//    }
-//    
-//    func updateTheTask(_ task: TaskList, title: String, contents: String, isCompleted: Bool, date: Date) {
-//        coreDataService.updateTask(task, newTitle: title, newContents: contents, isCompleted: isCompleted, newDate: date)
-//    }
-//    
-//    func deleteTask(_ task: TaskList) {
-//        coreDataService.deleteTask(task)
-//        getAllTasks()
-//    }
-
+    
+    func addNewTask(_ title: String) {
+        coreDataManager.createTask(title: title)
+        storedTasks = coreDataManager.fetchAllTasks()
+        view?.showFetchedTasks(tasks)
+    }
+    
+    func updateTheTask(_ task: ToDoList, title: String, isCompleted: Bool, userID: Int) {
+        coreDataManager.updateTask(task,
+                                   newTitle: title,
+                                   isCompleted: isCompleted,
+                                   userID: userID
+        )
+    }
+    
+    func deleteTask(_ task: ToDoList) {
+        coreDataManager.deleteTask(task)
+        storedTasks = coreDataManager.fetchAllTasks()
+        view?.showFetchedTasks(tasks)
+    }
+}

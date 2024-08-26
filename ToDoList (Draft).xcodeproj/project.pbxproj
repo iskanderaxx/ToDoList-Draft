@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8C0FCA122C7C6EAD00E62098 /* ToDoList+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0FCA112C7C6EAD00E62098 /* ToDoList+CoreDataProperties.swift */; };
 		8C1C22F72C7B3F83009A0E66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C22F62C7B3F83009A0E66 /* AppDelegate.swift */; };
 		8C1C22F92C7B3F83009A0E66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C22F82C7B3F83009A0E66 /* SceneDelegate.swift */; };
 		8C1C22FB2C7B3F83009A0E66 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C22FA2C7B3F83009A0E66 /* MainViewController.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8C0FCA112C7C6EAD00E62098 /* ToDoList+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToDoList+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		8C1C22F32C7B3F83009A0E66 /* ToDoList (Draft).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ToDoList (Draft).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C1C22F62C7B3F83009A0E66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8C1C22F82C7B3F83009A0E66 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -183,8 +185,9 @@
 		8C1C232D2C7B41CF009A0E66 /* MainEntity */ = {
 			isa = PBXGroup;
 			children = (
-				8C1C23392C7B443C009A0E66 /* MainEntity.swift */,
+				8C0FCA112C7C6EAD00E62098 /* ToDoList+CoreDataProperties.swift */,
 				8C1C22FF2C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodeld */,
+				8C1C23392C7B443C009A0E66 /* MainEntity.swift */,
 			);
 			path = MainEntity;
 			sourceTree = "<group>";
@@ -391,6 +394,7 @@
 				8C1C23382C7B4423009A0E66 /* MainPresenter.swift in Sources */,
 				8C1C23012C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodeld in Sources */,
 				8C1C22F72C7B3F83009A0E66 /* AppDelegate.swift in Sources */,
+				8C0FCA122C7C6EAD00E62098 /* ToDoList+CoreDataProperties.swift in Sources */,
 				8C1C23452C7B585B009A0E66 /* DetailViewCell.swift in Sources */,
 				8C1C233E2C7B4588009A0E66 /* CoreDataManager.swift in Sources */,
 				8C1C23412C7B5808009A0E66 /* DetailViewController.swift in Sources */,
