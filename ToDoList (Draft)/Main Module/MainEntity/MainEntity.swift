@@ -18,7 +18,9 @@ struct TaskList: Codable {
     let userID: Int
 
     enum CodingKeys: String, CodingKey {
-        case id, title, completed
+        case id
+        case title = "todo"
+        case completed
         case userID = "userId"
     }
 }

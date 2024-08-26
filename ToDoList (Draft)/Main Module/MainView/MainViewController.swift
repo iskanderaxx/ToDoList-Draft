@@ -9,7 +9,6 @@ import UIKit
 import SnapKit
 
 protocol MainViewProtocol: AnyObject {
-    // Shall have reference to Presenter
     var presenter: MainPresenterProtocol? { get set }
     
     func showFetchedTasks(_ result: [TaskList])
@@ -18,6 +17,7 @@ protocol MainViewProtocol: AnyObject {
 
 final class MainViewController: UIViewController, MainViewProtocol {
     var presenter: MainPresenterProtocol?
+    
     private var coreDataManager = CoreDataManager.shared
     
     // MARK: - UI Elements
@@ -147,9 +147,7 @@ final class MainViewController: UIViewController, MainViewProtocol {
     
     func showFetchedTasks(_ result: [TaskList]) {
         DispatchQueue.main.async {
-//            print("Tasks received: \(result.count)")
             self.tableView.reloadData()
-//            self.tableView.layoutIfNeeded()
         }
     }
     

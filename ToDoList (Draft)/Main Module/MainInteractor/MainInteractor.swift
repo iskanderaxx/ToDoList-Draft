@@ -8,7 +8,6 @@
 import UIKit
 
 protocol MainInteractorProtocol {
-    // Shall have reference to Presenter
     var presenter: MainPresenterProtocol? { get set }
     
     func fetchTasks()
@@ -16,7 +15,7 @@ protocol MainInteractorProtocol {
 
 final class MainInteractor: MainInteractorProtocol {
     var presenter: MainPresenterProtocol?
-//    var coreDataManager = CoreDataManager.shared
+    private var coreDataManager = CoreDataManager.shared
     
     func fetchTasks() {
         guard let url = URL(string: "https://dummyjson.com/todos") else { return }
@@ -24,6 +23,7 @@ final class MainInteractor: MainInteractorProtocol {
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             if let error = error {
                 self?.presenter?.interactorDidFailFetchTasks(with: error)
+                print("Unexpected error: \(error.localizedDescription)")
                 return
             }
             
@@ -33,6 +33,7 @@ final class MainInteractor: MainInteractorProtocol {
                 let taskResponse = try JSONDecoder().decode(TaskResponse.self, from: data)
                 self?.presenter?.interactorDidFetchTasks(taskResponse.todos)
             } catch let error {
+                print("Decoding data error: \(error.localizedDescription)")
                 self?.presenter?.interactorDidFailFetchTasks(with: error)
             }
         }
