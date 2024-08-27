@@ -5,20 +5,23 @@
 //  Created by Mac Alexander on 25.08.2024.
 //
 
-//import UIKit
-//import SnapKit
-//import CoreData
-//
-//final class DetailViewController: UIViewController, DetailViewProtocol {
-//    
-//    private let member: MemberList
+import UIKit
+import SnapKit
+import CoreData
+
+protocol DetailViewProtocol: AnyObject {
+    func showError(with error: Error) // , DetailViewProtocol
+}
+
+final class DetailViewController: UIViewController {
+//    private let task: ToDoList
 //    private let coreDataManager = CoreDataManager.shared
 //    private var isEditingEnabled = false
 //    
 //    // MARK: Initializers
 //    
-//    init(member: MemberList) {
-//        self.member = member
+//    init(task: ToDoList) {
+//        self.task = task
 //        super.init(nibName: nil, bundle: nil)
 //    }
 //    
@@ -41,7 +44,7 @@
 //        button.layer.borderColor =
 //        UIColor.systemBlue.cgColor
 //        button.addTarget(self, action: #selector(
-//            editButtonPressed), for: .touchUpInside) // Исправлено.
+//            editButtonPressed), for: .touchUpInside)
 //        return button
 //    }()
 //    
@@ -138,7 +141,7 @@
 //
 //extension DetailViewController: UITableViewDataSource {
 //    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        MemberList.managedPropertiesCount
+//        ToDoList.managedPropertiesCount
 //    }
 //    
 //    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -153,7 +156,7 @@
 //
 //        switch indexPath.row {
 //        case 0:
-//            cell.configureCell(with: member.name ?? "", iconName: "person")
+//            cell.configureCell(with: task.title ?? "", iconName: "person")
 //        case 1:
 //            if let dateOfBirth = member.dateOfBirth {
 //                let dateFormatter = DateFormatter()
@@ -254,4 +257,4 @@
 //        }))
 //        present(alert, animated: true, completion: nil)
 //    }
-//}
+}

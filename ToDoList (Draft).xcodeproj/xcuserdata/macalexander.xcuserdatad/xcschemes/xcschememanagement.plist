@@ -23,12 +23,30 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>0</integer>
 		</dict>
 		<key>ToDoList (Draft).xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>8C1C22F22C7B3F83009A0E66</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>8C1C230B2C7B3F84009A0E66</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>8C1C23152C7B3F84009A0E66</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

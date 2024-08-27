@@ -5,12 +5,10 @@
 //  Created by Mac Alexander on 25.08.2024.
 //
 
-//import UIKit
-//import SnapKit
-//
-//final class DetailViewCell: UITableViewCell {
-//    
-//    // MARK: Initializers
+import UIKit
+import SnapKit
+
+final class DetailViewCell: UITableViewCell {
 //    
 //    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 //        super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -78,4 +76,4 @@
 //            textField.textColor = UIColor.secondaryLabel
 //        }
 //    }
-//}
+}

@@ -11,7 +11,7 @@
 		8C1C22F72C7B3F83009A0E66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C22F62C7B3F83009A0E66 /* AppDelegate.swift */; };
 		8C1C22F92C7B3F83009A0E66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C22F82C7B3F83009A0E66 /* SceneDelegate.swift */; };
 		8C1C22FB2C7B3F83009A0E66 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C22FA2C7B3F83009A0E66 /* MainViewController.swift */; };
-		8C1C23012C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C22FF2C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodeld */; };
+		8C1C23012C7B3F83009A0E66 /* ToDoList.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C22FF2C7B3F83009A0E66 /* ToDoList.xcdatamodeld */; };
 		8C1C23032C7B3F84009A0E66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8C1C23022C7B3F84009A0E66 /* Assets.xcassets */; };
 		8C1C23062C7B3F84009A0E66 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 8C1C23052C7B3F84009A0E66 /* Base */; };
 		8C1C23112C7B3F84009A0E66 /* ToDoList__Draft_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1C23102C7B3F84009A0E66 /* ToDoList__Draft_Tests.swift */; };
@@ -122,7 +122,7 @@
 				8C1C23292C7B40A6009A0E66 /* Application */,
 				8C1C23302C7B41FE009A0E66 /* CoreDataManager */,
 				8C1C232A2C7B4144009A0E66 /* Main Module */,
-				8C1C233F2C7B5696009A0E66 /* DetailModule */,
+				8C1C233F2C7B5696009A0E66 /* Detail Module */,
 				8C1C23312C7B4240009A0E66 /* Resources */,
 			);
 			path = "ToDoList (Draft)";
@@ -185,9 +185,9 @@
 		8C1C232D2C7B41CF009A0E66 /* MainEntity */ = {
 			isa = PBXGroup;
 			children = (
-				8C0FCA112C7C6EAD00E62098 /* ToDoList+CoreDataProperties.swift */,
-				8C1C22FF2C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodeld */,
 				8C1C23392C7B443C009A0E66 /* MainEntity.swift */,
+				8C0FCA112C7C6EAD00E62098 /* ToDoList+CoreDataProperties.swift */,
+				8C1C22FF2C7B3F83009A0E66 /* ToDoList.xcdatamodeld */,
 			);
 			path = MainEntity;
 			sourceTree = "<group>";
@@ -226,13 +226,13 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		8C1C233F2C7B5696009A0E66 /* DetailModule */ = {
+		8C1C233F2C7B5696009A0E66 /* Detail Module */ = {
 			isa = PBXGroup;
 			children = (
 				8C1C23422C7B580E009A0E66 /* DetailView */,
 				8C1C23432C7B5825009A0E66 /* DetailPresenter */,
 			);
-			path = DetailModule;
+			path = "Detail Module";
 			sourceTree = "<group>";
 		};
 		8C1C23422C7B580E009A0E66 /* DetailView */ = {
@@ -392,7 +392,7 @@
 				8C1C233C2C7B4497009A0E66 /* MainRouter.swift in Sources */,
 				8C1C233A2C7B443C009A0E66 /* MainEntity.swift in Sources */,
 				8C1C23382C7B4423009A0E66 /* MainPresenter.swift in Sources */,
-				8C1C23012C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodeld in Sources */,
+				8C1C23012C7B3F83009A0E66 /* ToDoList.xcdatamodeld in Sources */,
 				8C1C22F72C7B3F83009A0E66 /* AppDelegate.swift in Sources */,
 				8C0FCA122C7C6EAD00E62098 /* ToDoList+CoreDataProperties.swift in Sources */,
 				8C1C23452C7B585B009A0E66 /* DetailViewCell.swift in Sources */,
@@ -758,13 +758,13 @@
 /* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
-		8C1C22FF2C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodeld */ = {
+		8C1C22FF2C7B3F83009A0E66 /* ToDoList.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
 				8C1C23002C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodel */,
 			);
 			currentVersion = 8C1C23002C7B3F83009A0E66 /* ToDoList__Draft_.xcdatamodel */;
-			path = ToDoList__Draft_.xcdatamodeld;
+			path = ToDoList.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

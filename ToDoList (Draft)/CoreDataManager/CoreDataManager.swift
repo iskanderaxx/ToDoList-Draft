@@ -19,7 +19,7 @@ final class CoreDataManager {
         let container = NSPersistentContainer(name: "ToDoList")
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
-                fatalError("Unresolved error: \(error.userInfo)")
+                fatalError("Unresolved error: \(error), \(error.userInfo)")
             }
         }
         return container
@@ -50,7 +50,7 @@ final class CoreDataManager {
             let tasks = try context.fetch(ToDoList.fetchRequest())
             return tasks
         } catch {
-            print("Failed to fetch members: \(error)")
+            print("Failed to fetch tasks: \(error)")
             return []
         }
     }

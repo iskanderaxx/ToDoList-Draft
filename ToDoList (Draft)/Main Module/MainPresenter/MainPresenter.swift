@@ -12,14 +12,16 @@ protocol MainPresenterProtocol {
     var interactor: MainInteractorProtocol? { get set }
     var router: MainRouter? { get set }
     
-    var tasksCount: Int { get }
+    var coreDataTasks: [ToDoList] { get set }
+//    var tasksCount: Int { get }
     
-    func viewDidLoad()
+    func fetchTasksFromApi()
     func interactorDidFetchTasks(_ result: [TaskList])
     func interactorDidFailFetchTasks(with error: Error)
     func receiveTask(at index: Int) -> TaskList?
 
-    func addNewTask(_ title: String)
+    func getAllTasks()
+    func addTask(title: String)
     func updateTheTask(_ task: ToDoList, title: String)
     func deleteTask(_ task: ToDoList)
 }
@@ -30,26 +32,27 @@ final class MainPresenter: MainPresenterProtocol {
     var router: MainRouter?
     
     private var tasks: [TaskList] = []
-    private var coreDataTasks: [ToDoList] = [] // New
+    var coreDataTasks: [ToDoList] = []
     private var coreDataManager = CoreDataManager.shared
     
-    var tasksCount: Int { tasks.count + coreDataTasks.count }
+    init(view: MainViewProtocol) {
+        self.view = view
+    }
+    
+//    var tasksCount: Int { tasks.count + coreDataTasks.count }
     
     // MARK: - Setup
     
-    // Проблема возникает в презентере на этапе попытки впихнуть методы СД в фэтчинг - их надо делить
-    func viewDidLoad() { // изменить странное название
+    func fetchTasksFromApi() {
         interactor?.fetchTasks()
-//        fetchAndShowTasks() // New
     }
     
     func interactorDidFetchTasks(_ result: [TaskList]) {
         self.tasks = result
-//        saveTasksToCoreData(result) // New
-//        fetchAndShowTasks()
-        DispatchQueue.main.async {
-            self.view?.showFetchedTasks(result)
-        }
+        
+//        DispatchQueue.main.async {
+//            self.view?.showFetchedTasks(result)
+//        }
     }
     
     func interactorDidFailFetchTasks(with error: Error) {
@@ -63,41 +66,46 @@ final class MainPresenter: MainPresenterProtocol {
         return tasks[index]
     }
     
-    func addNewTask(_ title: String) {
+    // MARK: CRUD stack
+    
+    func getAllTasks() {
+        let tasks = coreDataManager.getAllTasks()
+        view?.showData(of: tasks)
+    }
+    
+    func addTask(title: String) {
         coreDataManager.createTask(title: title)
+        getAllTasks()
     }
     
     func updateTheTask(_ task: ToDoList, title: String) {
-        coreDataManager.updateTask(task, 
-                                   newTitle: title
-        )
-//        fetchAndShowTasks()
+        coreDataManager.updateTask(task, newTitle: title)
     }
     
     func deleteTask(_ task: ToDoList) {
         coreDataManager.deleteTask(task)
-//        fetchAndShowTasks()
+        getAllTasks()
     }
     
     // MARK: - Helping functions
     
-    private func fetchAndShowTasks() {
-        let coreDataTasks = coreDataManager.getAllTasks()
-        let allTasks = tasks + coreDataTasks.map {
-            TaskList(id: $0.userID,
-                     title: $0.title ?? "",
-                     completed: $0.completed,
-                     userID: $0.userID
-            )
-        }
-        DispatchQueue.main.async {
-            self.view?.showFetchedTasks(allTasks)
-        }
-    }
-    
-    private func saveTasksToCoreData(_ tasks: [TaskList]) {
-        tasks.forEach { task in
-            coreDataManager.createTask(title: task.title)
-        }
-    }
+//    private func fetchAndShowTasks() {
+//        let coreDataTasks = coreDataManager.getAllTasks()
+//        let allTasks = tasks + coreDataTasks.map {
+//            TaskList(id: Int($0.userID),
+//                     title: $0.title ?? "",
+//                     completed: $0.completed,
+//                     userID: Int($0.userID)
+//            )
+//        }
+//        DispatchQueue.main.async {
+//            self.view?.showFetchedTasks(allTasks)
+//        }
+//    }
+//    
+//    private func saveTasksToCoreData(_ tasks: [TaskList]) {
+//        tasks.forEach { task in
+//            coreDataManager.createTask(title: task.title)
+//        }
+//    }
 }

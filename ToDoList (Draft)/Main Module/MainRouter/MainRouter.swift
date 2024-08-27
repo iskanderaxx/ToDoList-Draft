@@ -23,7 +23,7 @@ final class MainRouter: MainRouterProtocol {
         
         let view = MainViewController()
         let interactor = MainInteractor()
-        let presenter = MainPresenter()
+        let presenter = MainPresenter(view: view)
         
         view.presenter = presenter
         interactor.presenter = presenter
