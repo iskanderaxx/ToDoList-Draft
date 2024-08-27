@@ -5,88 +5,72 @@
 //  Created by Mac Alexander on 25.08.2024.
 //
 
-import UIKit
 import CoreData
+import UIKit
 
 final class CoreDataManager {
     static let shared = CoreDataManager()
-    private var interactor: MainInteractor?
+    
+    private init() {}
     
     // MARK: - Core Data stack
     
-    lazy var persistentContainer: NSPersistentContainer = {
+   lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "ToDoList")
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+                fatalError("Unresolved error: \(error.userInfo)")
             }
         }
         return container
     }()
     
-    var context: NSManagedObjectContext {
+    private var context: NSManagedObjectContext {
         persistentContainer.viewContext
     }
     
     // MARK: - Core Data Saving support
     
     func saveContext() {
-        let context = persistentContainer.viewContext
         if context.hasChanges {
             do {
                 try context.save()
             } catch {
-                let error = error as NSError
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+                context.rollback()
+                let nserror = error as NSError
+                fatalError("Failed to save tasks: \(error), \(nserror.userInfo)")
             }
         }
     }
     
     // MARK: CRUD stack
     
-    func fetchAllTasks() -> [ToDoList] {
-        let fetchRequest: NSFetchRequest<ToDoList> = ToDoList.fetchRequest()
-        
+    func getAllTasks() -> [ToDoList] {
         do {
-            let tasks = try context.fetch(fetchRequest)
+            let tasks = try context.fetch(ToDoList.fetchRequest())
             return tasks
         } catch {
-            print("Tasks fetching went wrong with error: \(error), please try again.")
+            print("Failed to fetch members: \(error)")
             return []
         }
     }
     
     func createTask(title: String) {
-        let task = ToDoList(context: context)
-        task.title = title
+        let newTask = ToDoList(context: context)
+        newTask.title = title
         
-        do {
-            try context.save()
-        } catch {
-            print("Task creation went wrong with error: \(error), please try again.")
-            interactor?.presenter?.view?.showError(error)
-        }
+        saveContext()
     }
     
-    func updateTask(_ task: ToDoList, newTitle: String, isCompleted: Bool, userID: Int) {
+    func updateTask(_ task: ToDoList, newTitle: String) {
         task.title = newTitle
-        task.completed = isCompleted
-        task.userID = userID
-        
-        do {
-            try context.save()
-        } catch {
-            interactor?.presenter?.view?.showError(error)
-        }
+    
+        saveContext()
     }
     
     func deleteTask(_ task: ToDoList) {
         context.delete(task)
         
-        do {
-            try context.save()
-        } catch {
-            interactor?.presenter?.view?.showError(error)
-        }
+        saveContext()
     }
 }
