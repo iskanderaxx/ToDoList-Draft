@@ -11,14 +11,14 @@ import SnapKit
 protocol MainViewProtocol: AnyObject {
     var presenter: MainPresenterProtocol? { get set }
     
-//    func showFetchedTasks(_ result: [TaskList])
     func showData(of: [ToDoList])
     func showError(_ error: Error)
+    
+    func showFetchedTasks(_ result: [TaskList])
 }
 
 final class MainViewController: UIViewController, MainViewProtocol {
     var presenter: MainPresenterProtocol?
-    
     private var coreDataManager = CoreDataManager.shared
     
     // MARK: - UI Elements
@@ -86,7 +86,6 @@ final class MainViewController: UIViewController, MainViewProtocol {
         tableView.layer.masksToBounds = true
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableView.automaticDimension
-        // Метод, чтобы убрать тап вне экрана
         return tableView
     }()
     
@@ -94,31 +93,24 @@ final class MainViewController: UIViewController, MainViewProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemGray3
-
-        setupTitle()
-        setupUserPresenter()
+        setupPresenter()
         setupViewHierarchy()
         setupLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        presenter?.fetchTasksFromApi()
+        presenter?.fetchApiTasks()
     }
     
     // MARK: - Setup & Layout
     
-    private func setupTitle() {
-        title = "ToDo List"
-        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
-        navigationController?.navigationBar.prefersLargeTitles = true
-    }
-    
-    private func setupUserPresenter() {
-        presenter = MainPresenter(view: self)
+    private func setupPresenter() {
+//        presenter = MainPresenter(view: self)
+//        presenter?.interactor = MainInteractor()
+        
         presenter?.getAllTasks()
-//        presenter?.fetchTasksFromApi()
+        presenter?.fetchApiTasks()
     }
     
     private func setupViewHierarchy() {
@@ -163,14 +155,25 @@ final class MainViewController: UIViewController, MainViewProtocol {
             make.top.equalTo(grayView.snp.top).offset(15)
             make.leading.equalTo(grayView.snp.leading).offset(15)
             make.trailing.equalTo(grayView.snp.trailing).offset(-15)
+            make.height.equalTo(0)
         }
     }
     
     func updateTableViewHeight() {
-        tableView.snp.updateConstraints { make in
-            make.height.equalTo(tableView.contentSize.height)
+        DispatchQueue.main.async {
+            let contentHeight = self.tableView.contentSize.height
+            self.tableView.snp.updateConstraints { make in
+                make.height.equalTo(contentHeight)
+            }
+            self.view.layoutIfNeeded()
         }
-        view.layoutIfNeeded()
+    }
+    
+    func showFetchedTasks(_ result: [TaskList]) {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.updateTableViewHeight()
+        }
     }
     
     // MARK: - Actions
@@ -183,21 +186,40 @@ final class MainViewController: UIViewController, MainViewProtocol {
     }
 }
 
+// MARK: - Extensions
+
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        presenter?.coreDataTasks.count ?? 0
+        let allCoreDataTasks = presenter?.coreDataTasks.count ?? 0
+        let allApiTasks = presenter?.apiTasks.count ?? 0
+        return allCoreDataTasks + allApiTasks
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let task = presenter?.coreDataTasks[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "defaultCell", for: indexPath)
-        cell.textLabel?.text = task?.title
+        if indexPath.row < presenter?.coreDataTasks.count ?? 0 {
+            let task = presenter?.coreDataTasks[indexPath.row]
+            cell.textLabel?.text = task?.title
+        } else {
+            let apiTaskIndex = indexPath.row - (presenter?.coreDataTasks.count ?? 0)
+            if let task = presenter?.receiveApiTask(at: apiTaskIndex) {
+                cell.textLabel?.text = task.title
+            }
+        }
         cell.accessoryType = .disclosureIndicator
         return cell
     }
 }
 
 extension MainViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row < presenter?.coreDataTasks.count ?? 0 {
+            if let task = presenter?.coreDataTasks[indexPath.row] {
+                presenter?.didSelectTask(task)
+            }
+        }
+    }
+    
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         true
     }
@@ -206,23 +228,19 @@ extension MainViewController: UITableViewDelegate {
         if editingStyle == .delete {
             guard let task = presenter?.coreDataTasks[indexPath.row] else { return }
             presenter?.deleteTask(task)
+            
+            tableView.beginUpdates()
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            tableView.endUpdates()
             tableView.reloadData()
         }
     }
 }
 
 extension MainViewController {
-    
-    //    func showFetchedTasks(_ result: [TaskList]) {
-    //        DispatchQueue.main.async {
-    //            self.tableView.reloadData()
-    //        }
-    //    }
-    
     func showData(of tasks: [ToDoList]) {
-        self.presenter?.coreDataTasks = tasks
-        self.tableView.reloadData()
-        self.updateTableViewHeight()
+        tableView.reloadData()
+        updateTableViewHeight()
     }
     
     func showError(_ error: Error) {

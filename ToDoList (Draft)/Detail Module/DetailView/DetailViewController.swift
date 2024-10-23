@@ -5,32 +5,37 @@
 //  Created by Mac Alexander on 25.08.2024.
 //
 
+import CoreData
 import UIKit
 import SnapKit
-import CoreData
 
 protocol DetailViewProtocol: AnyObject {
-    func showError(with error: Error) // , DetailViewProtocol
+    var presenter: DetailPresenterProtocol? { get set }
+    
+//    func showCellData(of: ToDoList)
+//    func showCellError(with error: Error)
 }
 
-final class DetailViewController: UIViewController {
-//    private let task: ToDoList
-//    private let coreDataManager = CoreDataManager.shared
-//    private var isEditingEnabled = false
-//    
-//    // MARK: Initializers
-//    
-//    init(task: ToDoList) {
-//        self.task = task
-//        super.init(nibName: nil, bundle: nil)
-//    }
-//    
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//    
-//    // MARK: UI Elements & Outlets
-//    
+final class DetailViewController: UIViewController, DetailViewProtocol {
+    var presenter: DetailPresenterProtocol?
+
+    private let coreDataTask: ToDoList
+    private let coreDataManager = CoreDataManager.shared
+    private var isEditingEnabled = false
+    
+    // MARK: Initializers
+    
+    init(coreDataTask: ToDoList) {
+        self.coreDataTask = coreDataTask
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: UI Elements
+    
 //    private lazy var editButton: UIButton = {
 //        let button = UIButton(type: .system)
 //        button.clipsToBounds = true
@@ -48,9 +53,9 @@ final class DetailViewController: UIViewController {
 //        return button
 //    }()
 //    
-//    private lazy var memberImage: UIImageView = {
+//    private lazy var detailImage: UIImageView = {
 //        let imageView = UIImageView()
-//        imageView.image = UIImage(named: "eurovision")
+//        imageView.image = UIImage(named: "mountain.short")
 //        imageView.contentMode = .scaleAspectFill
 //        imageView.layer.cornerRadius = 125
 //        imageView.clipsToBounds = true
@@ -63,31 +68,32 @@ final class DetailViewController: UIViewController {
 //        return grayView
 //    }()
 //    
-//    private lazy var memberDataTable: UITableView = {
+//    private lazy var taskDataTable: UITableView = {
 //        let tableView = UITableView(frame: .zero, style: .plain)
 //        tableView.register(DetailViewCell.self,
 //                           forCellReuseIdentifier: "detailDefaultCell")
-//        tableView.dataSource = self
-//        tableView.delegate = self
+////        tableView.dataSource = self
+////        tableView.delegate = self
 //        tableView.layer.cornerRadius = 15
 //        tableView.layer.masksToBounds = true
 //        tableView.isScrollEnabled = false
 //        return tableView
 //    }()
-//    
-//    // MARK: Lifecycle
-//    
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        setupViewsHierarchy()
+    
+    // MARK: Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .green
+//        setupViewHierarchy()
 //        setupLayout()
-//    }
-//    
-//    // MARK: Setup & Layout
-//    
-//    private func setupViewsHierarchy() {
-//        [editButton, memberImage, detailGrayView].forEach { view.addSubview($0) }
-//        detailGrayView.addSubview(memberDataTable)
+    }
+    
+    // MARK: Setup & Layout
+    
+//    private func setupViewHierarchy() {
+//        [editButton, detailImage, detailGrayView].forEach { view.addSubview($0) }
+//        detailGrayView.addSubview(taskDataTable)
 //    }
 //    
 //    private func setupLayout() {
@@ -98,18 +104,18 @@ final class DetailViewController: UIViewController {
 //            make.height.equalTo(40)
 //        }
 //        
-//        memberImage.snp.makeConstraints { make in
+//        detailImage.snp.makeConstraints { make in
 //            make.centerX.equalTo(view)
 //            make.top.equalTo(view).offset(210)
 //            make.width.height.equalTo(250)
 //        }
 //        
 //        detailGrayView.snp.makeConstraints { make in
-//            make.top.equalTo(memberImage.snp.bottom).offset(30)
+//            make.top.equalTo(detailImage.snp.bottom).offset(30)
 //            make.leading.trailing.bottom.equalTo(view)
 //        }
 //        
-//        memberDataTable.snp.makeConstraints { make in
+//        taskDataTable.snp.makeConstraints { make in
 //            make.centerX.equalTo(detailGrayView)
 //            make.top.equalTo(detailGrayView).offset(15)
 //            make.leading.equalTo(detailGrayView.snp.leading).offset(15)
@@ -117,28 +123,20 @@ final class DetailViewController: UIViewController {
 //            make.height.equalTo(4 * 60).priority(.high)
 //        }
 //    }
-//    
-//    func showError(with error: Error) {
-//        let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
-//        alert.addAction(UIAlertAction(title: "OK", style: .default))
-//        present(alert, animated: true)
-//    }
-//    
-//    // MARK: Actions
-//    
+    
+    // MARK: Actions
+    
 //    @objc
 //    func editButtonPressed() {
 //        isEditingEnabled.toggle()
-//
 //        editButton.setTitle(isEditingEnabled ? "Save" : "Edit", for: .normal)
 //        editButton.backgroundColor = isEditingEnabled ? .systemBlue : .white
-//        
 //        if !isEditingEnabled { coreDataManager.saveContext() }
 //    }
-//}
-//
-//// MARK: - Extensions
-//
+}
+
+// MARK: - Extensions
+
 //extension DetailViewController: UITableViewDataSource {
 //    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 //        ToDoList.managedPropertiesCount
@@ -148,7 +146,6 @@ final class DetailViewController: UIViewController {
 //        60
 //    }
 //    
-//    // Не оч. модульно - добавить enum, который будет описывать кейсы
 //    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 //        guard let cell = tableView.dequeueReusableCell(withIdentifier: "detailDefaultCell", for: indexPath) as? DetailViewCell else  {
 //            return UITableViewCell()
@@ -156,13 +153,9 @@ final class DetailViewController: UIViewController {
 //
 //        switch indexPath.row {
 //        case 0:
-//            cell.configureCell(with: task.title ?? "", iconName: "person")
+//            cell.configureCell(with: coreDataTask.title ?? "", iconName: "person")
 //        case 1:
-//            if let dateOfBirth = member.dateOfBirth {
-//                let dateFormatter = DateFormatter()
-//                dateFormatter.dateStyle = .medium
-//                cell.configureCell(with: dateFormatter.string(from: dateOfBirth), iconName: "calendar")
-//            } else { cell.configureCell(with: "", iconName: "calendar") }
+//            cell.configureCell(with: coreDataTask.id ?? 0, iconName: <#T##String#>)
 //        case 2:
 //            cell.configureCell(with: member.gender ?? "", iconName: "person.2.circle")
 //        case 3:
@@ -200,7 +193,7 @@ final class DetailViewController: UIViewController {
 //        }
 //     }
 //}
-//
+
 //private extension DetailViewController {
 //    private func presentGenderSelectionAlert(for indexPath: IndexPath) {
 //        let alert = UIAlertController(title: "Choose gender", message: nil, preferredStyle: .actionSheet)
@@ -257,4 +250,17 @@ final class DetailViewController: UIViewController {
 //        }))
 //        present(alert, animated: true, completion: nil)
 //    }
-}
+//}
+
+//extension DetailViewController {
+//    func showCellData(of: ToDoList) {
+//        
+//    }
+//    
+//    func showCellError(with error: Error) {
+//        let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
+//        alert.addAction(UIAlertAction(title: "OK", style: .default))
+//        present(alert, animated: true)
+//    }
+//    
+//}

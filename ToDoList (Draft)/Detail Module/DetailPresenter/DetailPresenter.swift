@@ -5,7 +5,11 @@
 //  Created by Mac Alexander on 25.08.2024.
 //
 
-import CoreData
+import UIKit
+
+protocol DetailPresenterProtocol {
+    
+}
 
 final class DetailPresenter {
     private let task: ToDoList

@@ -9,10 +9,11 @@ import UIKit
 
 typealias EntryPoint = MainViewProtocol & UIViewController
 
-// // Shall have an EntryPoint
 protocol MainRouterProtocol {
     var entryPoint: EntryPoint? { get }
     static func start() -> MainRouterProtocol
+    
+    func navigateToDetailScreen(with task: ToDoList)
 }
 
 final class MainRouter: MainRouterProtocol {
@@ -33,5 +34,10 @@ final class MainRouter: MainRouterProtocol {
         router.entryPoint = view
         
         return router
+    }
+    
+    func navigateToDetailScreen(with task: ToDoList) {
+        let detailViewController = DetailViewController(coreDataTask: task)
+        entryPoint?.navigationController?.pushViewController(detailViewController, animated: true)
     }
 }

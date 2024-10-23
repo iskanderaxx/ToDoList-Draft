@@ -13,16 +13,16 @@ protocol MainPresenterProtocol {
     var router: MainRouter? { get set }
     
     var coreDataTasks: [ToDoList] { get set }
-//    var tasksCount: Int { get }
+    var apiTasks: [TaskList] { get set }
     
-    func fetchTasksFromApi()
+    func fetchApiTasks()
     func interactorDidFetchTasks(_ result: [TaskList])
     func interactorDidFailFetchTasks(with error: Error)
-    func receiveTask(at index: Int) -> TaskList?
+    func receiveApiTask(at index: Int) -> TaskList?
+    func didSelectTask(_ task: ToDoList)
 
     func getAllTasks()
     func addTask(title: String)
-    func updateTheTask(_ task: ToDoList, title: String)
     func deleteTask(_ task: ToDoList)
 }
 
@@ -31,28 +31,29 @@ final class MainPresenter: MainPresenterProtocol {
     var interactor: MainInteractorProtocol?
     var router: MainRouter?
     
-    private var tasks: [TaskList] = []
+    var apiTasks: [TaskList] = []
     var coreDataTasks: [ToDoList] = []
+    
     private var coreDataManager = CoreDataManager.shared
     
     init(view: MainViewProtocol) {
         self.view = view
+        self.interactor = MainInteractor()
     }
-    
-//    var tasksCount: Int { tasks.count + coreDataTasks.count }
     
     // MARK: - Setup
     
-    func fetchTasksFromApi() {
+    func fetchApiTasks() {
         interactor?.fetchTasks()
     }
     
     func interactorDidFetchTasks(_ result: [TaskList]) {
-        self.tasks = result
+        self.apiTasks = result
         
-//        DispatchQueue.main.async {
-//            self.view?.showFetchedTasks(result)
-//        }
+        DispatchQueue.main.async {  
+//            self.getAllTasks()
+            self.view?.showFetchedTasks(result)
+        }
     }
     
     func interactorDidFailFetchTasks(with error: Error) {
@@ -61,20 +62,49 @@ final class MainPresenter: MainPresenterProtocol {
         }
     }
     
-    func receiveTask(at index: Int) -> TaskList? {
-        guard index < tasks.count else { return nil }
-        return tasks[index]
+    func receiveApiTask(at index: Int) -> TaskList? { // ToDoList
+        guard index < apiTasks.count else { return nil }
+        return apiTasks[index]
     }
+    
+   func didSelectTask(_ task: ToDoList) {
+        router?.navigateToDetailScreen(with: task)
+    }
+    
+    // MARK: Converter
+    
+    private func convertTaskListToToDoList(with tasks: [TaskList]) -> [ToDoList] {
+        var toDoTasks: [ToDoList] = []
+        
+        for task in tasks {
+            let toDoTask = ToDoList(context: CoreDataManager.shared.persistentContainer.viewContext)
+            toDoTask.id = task.id
+            toDoTask.title = task.title
+            toDoTask.completed = task.completed
+            toDoTask.userID = task.userID
+            toDoTasks.append(toDoTask)
+        }
+        
+        CoreDataManager.shared.saveContext()
+        return toDoTasks
+    }
+}
+
+extension MainPresenter {
     
     // MARK: CRUD stack
     
     func getAllTasks() {
         let tasks = coreDataManager.getAllTasks()
-        view?.showData(of: tasks)
+        
+        DispatchQueue.main.async {
+            self.view?.showData(of: tasks)
+        }
     }
     
     func addTask(title: String) {
         coreDataManager.createTask(title: title)
+//        coreDataManager.saveContext()
         getAllTasks()
     }
     
@@ -86,26 +116,4 @@ final class MainPresenter: MainPresenterProtocol {
         coreDataManager.deleteTask(task)
         getAllTasks()
     }
-    
-    // MARK: - Helping functions
-    
-//    private func fetchAndShowTasks() {
-//        let coreDataTasks = coreDataManager.getAllTasks()
-//        let allTasks = tasks + coreDataTasks.map {
-//            TaskList(id: Int($0.userID),
-//                     title: $0.title ?? "",
-//                     completed: $0.completed,
-//                     userID: Int($0.userID)
-//            )
-//        }
-//        DispatchQueue.main.async {
-//            self.view?.showFetchedTasks(allTasks)
-//        }
-//    }
-//    
-//    private func saveTasksToCoreData(_ tasks: [TaskList]) {
-//        tasks.forEach { task in
-//            coreDataManager.createTask(title: task.title)
-//        }
-//    }
 }

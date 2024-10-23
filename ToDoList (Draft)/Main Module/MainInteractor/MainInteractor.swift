@@ -14,6 +14,7 @@ protocol MainInteractorProtocol {
 }
 
 final class MainInteractor: MainInteractorProtocol {
+    
     var presenter: MainPresenterProtocol?
     private var coreDataManager = CoreDataManager.shared
     
@@ -23,17 +24,18 @@ final class MainInteractor: MainInteractorProtocol {
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             if let error = error {
                 self?.presenter?.interactorDidFailFetchTasks(with: error)
-                print("Unexpected error: \(error.localizedDescription)")
                 return
             }
             
-            guard let data = data else { return }
+            guard let data = data else {
+                return
+            }
             
             do {
                 let taskResponse = try JSONDecoder().decode(TaskResponse.self, from: data)
+//                print("Fetched tasks: \(taskResponse.todos)")
                 self?.presenter?.interactorDidFetchTasks(taskResponse.todos)
-            } catch let error {
-                print("Decoding data error: \(error.localizedDescription)")
+            } catch {
                 self?.presenter?.interactorDidFailFetchTasks(with: error)
             }
         }

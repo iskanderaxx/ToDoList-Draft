@@ -230,7 +230,10 @@
 			isa = PBXGroup;
 			children = (
 				8C1C23422C7B580E009A0E66 /* DetailView */,
+				8C6D66832C7E82A800BC088D /* DetailInteractor */,
 				8C1C23432C7B5825009A0E66 /* DetailPresenter */,
+				8C6D66822C7E828A00BC088D /* DetailEntity */,
+				8C6D66812C7E828000BC088D /* DetailRouter */,
 			);
 			path = "Detail Module";
 			sourceTree = "<group>";
@@ -250,6 +253,27 @@
 				8C1C23462C7B6482009A0E66 /* DetailPresenter.swift */,
 			);
 			path = DetailPresenter;
+			sourceTree = "<group>";
+		};
+		8C6D66812C7E828000BC088D /* DetailRouter */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = DetailRouter;
+			sourceTree = "<group>";
+		};
+		8C6D66822C7E828A00BC088D /* DetailEntity */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = DetailEntity;
+			sourceTree = "<group>";
+		};
+		8C6D66832C7E82A800BC088D /* DetailInteractor */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = DetailInteractor;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
